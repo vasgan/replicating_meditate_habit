@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#6694a3</color>
+
+    <color name="bg_white">#FFFFFFFF</color>
+    <color name="background_color">#1d2326</color>
+    <color name="first_color">#3ad2ce</color>
+    <color name="second_color">#43a9b4</color>
+    <color name="third_color">#3bbac2</color>
+    <color name="transparent_background">#81000000</color>
+    <color name="background_bottom_navigation">#263238</color>
+    <color name="unseleted_menu_color">#95AAb4</color>
+    <color name="toolbar_color">#373e4e</color>
+</resources>

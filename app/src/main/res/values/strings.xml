@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Replicating</string>
+    <string name="meditate">Meditate</string>
+    <string name="me">Me</string>
+    <string name="more">More</string>
+    <string name="i_have">I HAVE</string>
+    <string name="minuties">MINUTES</string>
+
+    <string name="on_the_go">ON THE GO</string>
+    <string name="series">SERIES</string>
+    <string name="teachers">TEACHERS</string>
+</resources>
