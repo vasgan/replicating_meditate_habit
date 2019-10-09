@@ -17,7 +17,10 @@ import androidx.core.content.ContextCompat
 
 import java.util.ArrayList
 import java.util.Objects
+import kotlin.math.cos
 import kotlin.math.min
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 class PieView : View {
 
@@ -28,7 +31,7 @@ class PieView : View {
     private val centerTextPaint = Paint()
     private var mData: ArrayList<PieBeat>? = null
     private var mColors: ArrayList<Int>? = null
-    private var cir: Float = 0.toFloat()
+    private var centralCircleRadius: Float = 0.toFloat()
     private var centerInnerCir = 0
     private var centerTextFirstLine: String? = null
     private var centerTextSecondLine: String? = null
@@ -78,7 +81,7 @@ class PieView : View {
         centerX = (w / 2).toFloat()
         centerY = (h / 2).toFloat()
         radius = min(centerX, centerY)
-        cir = if (centerInnerCir == 1) {
+        centralCircleRadius = if (centerInnerCir == 1) {
             radius / 2 + radius / 8
         } else {
             (radius / 2.5).toFloat()
@@ -112,8 +115,8 @@ class PieView : View {
             arcR.set((centerX - radius).toInt(), (centerY - radius).toInt(), (centerX + radius).toInt(), (centerY + radius).toInt())
             arcP.moveTo(centerX, centerY)
             val cx = mAngle - angleValue
-            val nx = (Math.sin(cx.toDouble()) * radius).toFloat()
-            val ny = Math.sqrt((radius * radius + nx * nx).toDouble()).toFloat()
+            val nx = (sin(cx.toDouble()) * radius).toFloat()
+            val ny = sqrt((radius * radius + nx * nx).toDouble()).toFloat()
             arcP.lineTo(nx, ny)
             arcP.addArc(rect, angleValue, mAngle)
             arcP.lineTo(centerX, centerY)
@@ -122,8 +125,8 @@ class PieView : View {
 
 
             val textAngle = angleValue + mAngle / 2
-            val textPointX = (centerX + radius * 0.75 * Math.cos(Math.toRadians(textAngle.toDouble()))).toFloat()
-            val textPointY = (centerY + radius * 0.75 * Math.sin(Math.toRadians(textAngle.toDouble()))).toFloat()
+            val textPointX = (centerX + radius * 0.75 * cos(Math.toRadians(textAngle.toDouble()))).toFloat()
+            val textPointY = (centerY + radius * 0.75 * sin(Math.toRadians(textAngle.toDouble()))).toFloat()
             @SuppressLint("DrawAllocation")
             val pointF = PointF(textPointX, textPointY)
             textPaint.textAlign = Paint.Align.CENTER
@@ -137,7 +140,6 @@ class PieView : View {
                 val textH = fm.bottom - fm.top
                 canvas.drawText(pie.name!!, pointF.x, pointF.y + textH + 10f, textPaint)
             } else {
-                //todo подумать над двумя строчками
                 textPaint.textSize = radius / 11
                 if (pie.name!!.length > 10 && pie.name!!.contains(" ")) {
                     val first = pie.name!!.substring(0, pie.name!!.indexOf(" "))
@@ -160,9 +162,9 @@ class PieView : View {
         }
         //Отрисовка центральной окружности
         if (centerTextFirstLine != null) {
-            centerP.addCircle(rect.centerX(), rect.centerY(), cir, Path.Direction.CW)
+            centerP.addCircle(rect.centerX(), rect.centerY(), centralCircleRadius, Path.Direction.CW)
             centerR.setPath(centerP, globalRegion)
-            canvas.drawCircle(rect.centerX(), rect.centerY(), cir, circlePaint)
+            canvas.drawCircle(rect.centerX(), rect.centerY(), centralCircleRadius, circlePaint)
             centerTextPaint.color = centerTextColor
             val fm = centerTextPaint.fontMetrics
             val fontHeight = fm.descent - fm.ascent
