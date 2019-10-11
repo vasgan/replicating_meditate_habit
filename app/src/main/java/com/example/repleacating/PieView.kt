@@ -29,7 +29,7 @@ class PieView : View {
     private val circlePaint = Paint()
     private val textPaint = Paint()
     private val centerTextPaint = Paint()
-    private var mData: ArrayList<PieBeat>? = null
+    private var mData: ArrayList<PieBeat> = ArrayList()
     private var mColors: ArrayList<Int>? = null
     private var centralCircleRadius: Float = 0.toFloat()
     private var centerInnerCir = 0
@@ -91,40 +91,34 @@ class PieView : View {
     }
 
     override fun onDraw(canvas: Canvas) {
-        if (null == mData || mData!!.size == 0)
+        if (mData.size == 0)
             return
         canvas.drawColor(ContextCompat.getColor(context, android.R.color.transparent))
         @SuppressLint("DrawAllocation")
         val rect = RectF(centerX - radius, centerY - radius, centerX + radius, centerY + radius)
-        val oneAngleValue = (allValue / mData!!.size).toInt()
-        for (i in mData!!.indices) {
-            val pie = mData!![i]
+        val oneAngleValue = (allValue / mData.size).toInt()
+        for (i in mData.indices) {
+            val pie = mData[i]
             if (i == selectArcPosition)
                 mPaint.color = ContextCompat.getColor(context, R.color.colorAccent)
             else
                 mPaint.color = pie.color
 
-            val curtFraction = 1f
-            val mAngle = curtFraction * oneAngleValue
-            canvas.drawArc(rect, angleValue, mAngle, true, mPaint)
-
-            @SuppressLint("DrawAllocation")
+            canvas.drawArc(rect, angleValue, oneAngleValue.toFloat(), true, mPaint)
             val arcP = Path()
-            @SuppressLint("DrawAllocation")
             val arcR = Region()
             arcR.set((centerX - radius).toInt(), (centerY - radius).toInt(), (centerX + radius).toInt(), (centerY + radius).toInt())
             arcP.moveTo(centerX, centerY)
-            val cx = mAngle - angleValue
-            val nx = (sin(cx.toDouble()) * radius).toFloat()
-            val ny = sqrt((radius * radius + nx * nx).toDouble()).toFloat()
+            val cx = oneAngleValue - angleValue //угол сектора
+            val nx = (sin(cx.toDouble()) * radius).toFloat()// находим x
+            val ny = (cos(cx.toDouble()) * radius).toFloat()/*sqrt((radius * radius + nx * nx).toDouble()).toFloat()*/ //Находим у
             arcP.lineTo(nx, ny)
-            arcP.addArc(rect, angleValue, mAngle)
+            arcP.addArc(rect, angleValue, oneAngleValue.toFloat())
             arcP.lineTo(centerX, centerY)
             arcR.setPath(arcP, arcR)
             pie.region = arcR
 
-
-            val textAngle = angleValue + mAngle / 2
+            val textAngle = angleValue + oneAngleValue / 2
             val textPointX = (centerX + radius * 0.75 * cos(Math.toRadians(textAngle.toDouble()))).toFloat()
             val textPointY = (centerY + radius * 0.75 * sin(Math.toRadians(textAngle.toDouble()))).toFloat()
             @SuppressLint("DrawAllocation")
@@ -134,7 +128,7 @@ class PieView : View {
             if (isShowImage) {
                 textPaint.textSize = radius / 15
                 @SuppressLint("DrawAllocation")
-                val icon = BitmapFactory.decodeResource(getContext().resources, pie.drawable)
+                val icon = BitmapFactory.decodeResource(context.resources, pie.drawable)
                 canvas.drawBitmap(icon, pointF.x - 40, pointF.y - 90, textPaint)
                 val fm = textPaint.fontMetrics
                 val textH = fm.bottom - fm.top
@@ -158,7 +152,7 @@ class PieView : View {
                     canvas.drawText(pie.name!!, pointF.x, pointF.y + 10, textPaint)
             }
 
-            angleValue += mAngle
+            angleValue += oneAngleValue
         }
         //Отрисовка центральной окружности
         if (centerTextFirstLine != null) {
@@ -177,15 +171,11 @@ class PieView : View {
     }
 
     fun setData(mData: ArrayList<PieBeat>) {
-        this.mData = mData
         initData(mData)
+        this.mData = mData
     }
 
     fun setCenterInnerCir(centerInnerCir: Int) {
-        var centerInnerCir = centerInnerCir
-        if (centerInnerCir > 10) {
-            centerInnerCir = 10
-        }
         this.centerInnerCir = centerInnerCir
     }
 
@@ -224,10 +214,10 @@ class PieView : View {
 
     }
 
-    internal fun getTouchedPath(x: Int, y: Int): Int {
+    private fun getTouchedPath(x: Int, y: Int): Int {
         if (centerR.contains(x, y)) {
             return 0
-        } else if (selectArcPosition >= 0 && Objects.requireNonNull<Region>(mData!![selectArcPosition].region).contains(x, y)) {
+        } else if (selectArcPosition >= 0 && Objects.requireNonNull<Region>(mData[selectArcPosition].region).contains(x, y)) {
             return 1
         }
         return -1
@@ -247,8 +237,8 @@ class PieView : View {
                 val my = y - centerY
                 val result = mx * mx + my * my
                 if (result <= radius * radius) {
-                    for (i in mData!!.indices) {
-                        val pieBit = mData!![i]
+                    for (i in mData.indices) {
+                        val pieBit = mData[i]
                         if (pieBit.region!!.contains(x, y)) {
                             selectArcPosition = i
                             invalidate()
